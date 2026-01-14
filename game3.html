@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>保護氣球 - 防禦遊戲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #87CEEB 0%, #E0F7FF 100%);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: #FF6B6B;
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.1);
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            color: #4A4A4A;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+        
+        .game-area {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        #gameCanvas {
+            display: block;
+            background: linear-gradient(to bottom, #87CEEB 0%, #98D8F0 30%, #B0E5FF 100%);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            border: 5px solid #FFD166;
+            width: 100%;
+            height: 600px;
+        }
+        
+        .game-ui {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 25px;
+            z-index: 10;
+        }
+        
+        .ui-box {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 12px 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border: 3px solid #FFD166;
+            min-width: 150px;
+        }
+        
+        .ui-title {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        
+        .ui-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #FF6B6B;
+            text-align: center;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.1);
+        }
+        
+        .life-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .life {
+            width: 20px;
+            height: 20px;
+            background: #FF6B6B;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .life.empty {
+            background: #DDD;
+        }
+        
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 25px;
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .control-info {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            border: 3px solid #FFD166;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .control-info p {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        .key {
+            display: inline-block;
+            background: #FFD166;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 8px;
+            margin: 0 5px;
+            font-family: monospace;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            box-shadow: 0 3px 0 #E5B852;
+        }
+        
+        .buttons {
+            display: flex;
+            gap: 20px;
+            width: 100%;
+        }
+        
+        button {
+            flex: 1;
+            background: #06D6A0;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(6, 214, 160, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(6, 214, 160, 0.4);
+        }
+        
+        button:active {
+            transform: translateY(1px);
+        }
+        
+        #restart {
+            background: #FF6B6B;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+        
+        #restart:hover {
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        #pause {
+            background: #118AB2;
+            box-shadow: 0 5px 15px rgba(17, 138, 178, 0.3);
+        }
+        
+        #pause:hover {
+            box-shadow: 0 8px 20px rgba(17, 138, 178, 0.4);
+        }
+        
+        .instructions {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            width: 100%;
+            max-width: 500px;
+            border: 3px solid #FFD166;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .instructions h3 {
+            color: #118AB2;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            text-align: center;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .instructions .highlight {
+            color: #FF6B6B;
+            font-weight: bold;
+        }
+        
+        .game-over {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 100;
+            border: 5px solid #FF6B6B;
+            box-shadow: 0 0 40px rgba(255, 107, 107, 0.3);
+            display: none;
+        }
+        
+        .game-over h2 {
+            color: #FF6B6B;
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .game-over p {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .final-score {
+            font-size: 2.5rem;
+            color: #06D6A0;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        
+        .result {
+            font-size: 1.3rem;
+            color: #118AB2;
+            margin-bottom: 30px;
+        }
+        
+        #playAgain {
+            padding: 15px 40px;
+            font-size: 1.2rem;
+            background: #06D6A0;
+        }
+        
+        .powerup-display {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 10px 15px;
+            border: 3px solid #FFD166;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 200px;
+            justify-content: center;
+            display: none;
+        }
+        
+        .powerup-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .shield { background: #118AB2; }
+        .slow { background: #06D6A0; }
+        .multi { background: #FFD166; color: #333; }
+        .life { background: #FF6B6B; }
+        
+        .powerup-text {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .powerup-timer {
+            background: #333;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .balloon-container {
+            position: absolute;
+            top: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 5;
+        }
+        
+        .balloon-string {
+            width: 2px;
+            height: 150px;
+            background: #333;
+            margin-top: -10px;
+        }
+        
+        .balloon {
+            width: 80px;
+            height: 100px;
+            background: #FF6B6B;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: inset -10px -10px 0 rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            color: white;
+            font-weight: bold;
+            text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .balloon::before {
+            content: "";
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #FF6B6B;
+            border-radius: 50%;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .enemy {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+        }
+        
+        .powerup {
+            position: absolute;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .bullet {
+            position: absolute;
+            border-radius: 50%;
+            background: #FFD166;
+            box-shadow: 0 0 10px #FFD166;
+        }
+        
+        footer {
+            margin-top: 30px;
+            color: #666;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        .difficulty {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        
+        .difficulty-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            background: #DDD;
+            color: #333;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .difficulty-btn.active {
+            background: #118AB2;
+            color: white;
+        }
+        
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            #gameCanvas {
+                height: 500px;
+            }
+            
+            .game-over {
+                padding: 30px;
+                width: 90%;
+            }
+            
+            .game-over h2 {
+                font-size: 2.5rem;
+            }
+            
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .ui-box {
+                min-width: 120px;
+                padding: 10px 15px;
+            }
+            
+            .ui-value {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>保護氣球</h1>
+            <p class="subtitle">保護你的氣球不被刺破，消滅所有敵人！</p>
+        </header>
+        
+        <div class="game-area">
+            <canvas id="gameCanvas" width="800" height="600"></canvas>
+            
+            <div class="game-ui">
+                <div class="ui-box">
+                    <div class="ui-title">分數</div>
+                    <div class="ui-value" id="score">0</div>
+                </div>
+                
+                <div class="ui-box">
+                    <div class="ui-title">生命值</div>
+                    <div class="life-container" id="lifeContainer">
+                        <!-- 生命值圖示將由JavaScript動態生成 -->
+                    </div>
+                </div>
+                
+                <div class="ui-box">
+                    <div class="ui-title">關卡</div>
+                    <div class="ui-value" id="level">1</div>
+                </div>
+            </div>
+            
+            <div class="powerup-display" id="powerupDisplay">
+                <!-- 道具顯示將由JavaScript動態生成 -->
+            </div>
+            
+            <!-- 氣球裝飾 -->
+            <div class="balloon-container">
+                <div class="balloon">♥</div>
+                <div class="balloon-string"></div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <div class="difficulty">
+                <button class="difficulty-btn active" data-difficulty="easy">簡單</button>
+                <button class="difficulty-btn" data-difficulty="medium">中等</button>
+                <button class="difficulty-btn" data-difficulty="hard">困難</button>
+            </div>
+            
+            <div class="control-info">
+                <p>使用 <span class="key">W</span> <span class="key">A</span> <span class="key">S</span> <span class="key">D</span> 或方向鍵移動</p>
+                <p>使用 <span class="key">滑鼠</span> 或 <span class="key">空白鍵</span> 射擊</p>
+                <p>收集道具保護氣球，消滅所有敵人！</p>
+            </div>
+            
+            <div class="buttons">
+                <button id="restart">重新開始</button>
+                <button id="pause">暫停遊戲</button>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>遊戲規則</h3>
+            <ul>
+                <li><span class="highlight">保護紅色氣球</span>不被敵人刺破</li>
+                <li>使用移動鍵控制防禦者，射擊鍵攻擊敵人</li>
+                <li>消滅敵人獲得分數，每關都有特定敵人數量</li>
+                <li>收集不同顏色的道具獲得特殊能力：</li>
+                <li style="margin-left: 20px;">🔵 護盾 - 暫時無敵</li>
+                <li style="margin-left: 20px;">🟢 緩速 - 敵人移動變慢</li>
+                <li style="margin-left: 20px;">🟡 多重射擊 - 一次發射多發子彈</li>
+                <li style="margin-left: 20px;">🔴 生命值 - 恢復一點生命</li>
+                <li>氣球被刺破會損失生命值，生命值歸零遊戲結束</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>HTML5 保護氣球遊戲 &copy; 2023 | 防禦射擊遊戲</p>
+        </footer>
+    </div>
+
+    <!-- 遊戲結束畫面 -->
+    <div class="game-over" id="gameOverScreen">
+        <h2>遊戲結束</h2>
+        <p>你的分數</p>
+        <div class="final-score" id="finalScore">0</div>
+        <div class="result" id="resultMessage">繼續努力！</div>
+        <button id="playAgain">再玩一次</button>
+    </div>
+
+    <script>
+        // 遊戲變數
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreElement = document.getElementById('score');
+        const lifeContainer = document.getElementById('lifeContainer');
+        const levelElement = document.getElementById('level');
+        const powerupDisplay = document.getElementById('powerupDisplay');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const finalScoreElement = document.getElementById('finalScore');
+        const resultMessageElement = document.getElementById('resultMessage');
+        const restartButton = document.getElementById('restart');
+        const pauseButton = document.getElementById('pause');
+        const playAgainButton = document.getElementById('playAgain');
+        const difficultyButtons = document.querySelectorAll('.difficulty-btn');
+        
+        // 遊戲設置
+        const BALLOON_RADIUS = 40;
+        const BALLOON_X = canvas.width / 2;
+        const BALLOON_Y = 150;
+        const PLAYER_RADIUS = 20;
+        const PLAYER_SPEED = 5;
+        const BULLET_RADIUS = 5;
+        const BULLET_SPEED = 8;
+        
+        // 難度設置
+        let difficulty = 'easy';
+        const DIFFICULTY_SETTINGS = {
+            easy: { enemySpeed: 1.5, enemySpawnRate: 100, enemyHealth: 1, enemyCount: 10 },
+            medium: { enemySpeed: 2.0, enemySpawnRate: 80, enemyHealth: 2, enemyCount: 15 },
+            hard: { enemySpeed: 2.5, enemySpawnRate: 60, enemyHealth: 3, enemyCount: 20 }
+        };
+        
+        // 遊戲狀態
+        let score = 0;
+        let level = 1;
+        let lives = 3;
+        let gameOver = false;
+        let paused = false;
+        let gameStarted = false;
+        
+        // 遊戲物件
+        let player = { x: canvas.width / 2, y: canvas.height - 100, radius: PLAYER_RADIUS };
+        let bullets = [];
+        let enemies = [];
+        let powerups = [];
+        let particles = [];
+        
+        // 道具系統
+        let powerupActive = {
+            shield: { active: false, timeLeft: 0, maxTime: 5000 },
+            slow: { active: false, timeLeft: 0, maxTime: 7000 },
+            multiShot: { active: false, timeLeft: 0, maxTime: 10000 }
+        };
+        
+        // 鍵盤狀態
+        const keys = {};
+        
+        // 敵人計數
+        let enemiesKilled = 0;
+        let enemiesToKill = DIFFICULTY_SETTINGS[difficulty].enemyCount;
+        
+        // 初始化遊戲
+        function initGame() {
+            // 重置遊戲狀態
+            score = 0;
+            level = 1;
+            lives = 3;
+            gameOver = false;
+            paused = false;
+            enemiesKilled = 0;
+            enemiesToKill = DIFFICULTY_SETTINGS[difficulty].enemyCount;
+            
+            // 重置遊戲物件
+            player = { x: canvas.width / 2, y: canvas.height - 100, radius: PLAYER_RADIUS };
+            bullets = [];
+            enemies = [];
+            powerups = [];
+            particles = [];
+            
+            // 重置道具
+            powerupActive = {
+                shield: { active: false, timeLeft: 0, maxTime: 5000 },
+                slow: { active: false, timeLeft: 0, maxTime: 7000 },
+                multiShot: { active: false, timeLeft: 0, maxTime: 10000 }
+            };
+            
+            // 隱藏道具顯示
+            powerupDisplay.style.display = 'none';
+            
+            // 更新UI
+            updateUI();
+            
+            // 隱藏遊戲結束畫面
+            gameOverScreen.style.display = 'none';
+            
+            // 開始遊戲循環
+            gameLoop();
+        }
+        
+        // 更新UI
+        function updateUI() {
+            scoreElement.textContent = score;
+            levelElement.textContent = level;
+            
+            // 更新生命值顯示
+            lifeContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const life = document.createElement('div');
+                life.className = `life ${i < lives ? '' : 'empty'}`;
+                lifeContainer.appendChild(life);
+            }
+            
+            // 更新道具顯示
+            updatePowerupDisplay();
+        }
+        
+        // 更新道具顯示
+        function updatePowerupDisplay() {
+            let activePowerups = [];
+            
+            if (powerupActive.shield.active) {
+                activePowerups.push({
+                    type: 'shield',
+                    name: '護盾',
+                    timeLeft: powerupActive.shield.timeLeft,
+                    maxTime: powerupActive.shield.maxTime
+                });
+            }
+            
+            if (powerupActive.slow.active) {
+                activePowerups.push({
+                    type: 'slow',
+                    name: '緩速',
+                    timeLeft: powerupActive.slow.timeLeft,
+                    maxTime: powerupActive.slow.maxTime
+                });
+            }
+            
+            if (powerupActive.multiShot.active) {
+                activePowerups.push({
+                    type: 'multi',
+                    name: '多重射擊',
+                    timeLeft: powerupActive.multiShot.timeLeft,
+                    maxTime: powerupActive.multiShot.maxTime
+                });
+            }
+            
+            if (activePowerups.length > 0) {
+                powerupDisplay.style.display = 'flex';
+                powerupDisplay.innerHTML = '';
+                
+                activePowerups.forEach(powerup => {
+                    const powerupItem = document.createElement('div');
+                    powerupItem.style.display = 'flex';
+                    powerupItem.style.alignItems = 'center';
+                    powerupItem.style.gap = '5px';
+                    
+                    const icon = document.createElement('div');
+                    icon.className = `powerup-icon ${powerup.type}`;
+                    icon.textContent = getPowerupSymbol(powerup.type);
+                    
+                    const text = document.createElement('div');
+                    text.className = 'powerup-text';
+                    text.textContent = powerup.name;
+                    
+                    const timer = document.createElement('div');
+                    timer.className = 'powerup-timer';
+                    timer.textContent = Math.ceil(powerup.timeLeft / 1000) + 's';
+                    
+                    powerupItem.appendChild(icon);
+                    powerupItem.appendChild(text);
+                    powerupItem.appendChild(timer);
+                    powerupDisplay.appendChild(powerupItem);
+                });
+            } else {
+                powerupDisplay.style.display = 'none';
+            }
+        }
+        
+        // 獲取道具符號
+        function getPowerupSymbol(type) {
+            switch(type) {
+                case 'shield': return '🛡️';
+                case 'slow': return '🐌';
+                case 'multi': return '🔫';
+                default: return '⭐';
+            }
+        }
+        
+        // 遊戲主循環
+        function gameLoop() {
+            if (gameOver || !gameStarted) return;
+            
+            // 清除畫布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 更新遊戲狀態
+            if (!paused) {
+                updateGame();
+            }
+            
+            // 繪製遊戲
+            drawGame();
+            
+            // 繼續遊戲循環
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 更新遊戲狀態
+        function updateGame() {
+            // 更新玩家位置
+            updatePlayer();
+            
+            // 更新子彈
+            updateBullets();
+            
+            // 更新敵人
+            updateEnemies();
+            
+            // 更新道具
+            updatePowerups();
+            
+            // 更新粒子效果
+            updateParticles();
+            
+            // 更新道具計時器
+            updatePowerupTimers();
+            
+            // 隨機生成敵人
+            if (enemies.length < 10 && Math.random() < DIFFICULTY_SETTINGS[difficulty].enemySpawnRate / 1000) {
+                spawnEnemy();
+            }
+            
+            // 隨機生成道具
+            if (powerups.length < 3 && Math.random() < 0.002) {
+                spawnPowerup();
+            }
+            
+            // 檢查是否通過關卡
+            if (enemiesKilled >= enemiesToKill) {
+                nextLevel();
+            }
+        }
+        
+        // 更新玩家位置
+        function updatePlayer() {
+            // 移動玩家
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+                player.x -= PLAYER_SPEED;
+            }
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+                player.x += PLAYER_SPEED;
+            }
+            if (keys['ArrowUp'] || keys['w'] || keys['W']) {
+                player.y -= PLAYER_SPEED;
+            }
+            if (keys['ArrowDown'] || keys['s'] || keys['S']) {
+                player.y += PLAYER_SPEED;
+            }
+            
+            // 限制玩家在畫布內
+            player.x = Math.max(player.radius, Math.min(canvas.width - player.radius, player.x));
+            player.y = Math.max(player.radius, Math.min(canvas.height - player.radius, player.y));
+        }
+        
+        // 更新子彈
+        function updateBullets() {
+            for (let i = bullets.length - 1; i >= 0; i--) {
+                const bullet = bullets[i];
+                
+                // 移動子彈
+                bullet.y -= bullet.speed;
+                
+                // 檢查子彈是否超出畫面
+                if (bullet.y < -bullet.radius) {
+                    bullets.splice(i, 1);
+                    continue;
+                }
+                
+                // 檢查子彈是否擊中敵人
+                for (let j = enemies.length - 1; j >= 0; j--) {
+                    const enemy = enemies[j];
+                    const distance = Math.sqrt(
+                        Math.pow(bullet.x - enemy.x, 2) + Math.pow(bullet.y - enemy.y, 2)
+                    );
+                    
+                    if (distance < bullet.radius + enemy.radius) {
+                        // 敵人受傷
+                        enemy.health--;
+                        
+                        // 創建擊中效果
+                        createHitEffect(enemy.x, enemy.y, enemy.color);
+                        
+                        // 移除子彈
+                        bullets.splice(i, 1);
+                        
+                        // 如果敵人死亡
+                        if (enemy.health <= 0) {
+                            // 增加分數
+                            score += 10 * level;
+                            enemiesKilled++;
+                            
+                            // 有時掉落道具
+                            if (Math.random() < 0.3) {
+                                spawnPowerup(enemy.x, enemy.y);
+                            }
+                            
+                            // 創建爆炸效果
+                            createExplosion(enemy.x, enemy.y, enemy.color);
+                            
+                            // 移除敵人
+                            enemies.splice(j, 1);
+                        }
+                        
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // 更新敵人
+        function updateEnemies() {
+            for (let i = enemies.length - 1; i >= 0; i--) {
+                const enemy = enemies[i];
+                
+                // 計算朝向氣球的方向
+                const dx = BALLOON_X - enemy.x;
+                const dy = BALLOON_Y - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // 移動敵人（如果緩速效果激活，減半速度）
+                const speed = powerupActive.slow.active ? enemy.speed * 0.5 : enemy.speed;
+                enemy.x += (dx / distance) * speed;
+                enemy.y += (dy / distance) * speed;
+                
+                // 檢查敵人是否接觸氣球
+                const balloonDistance = Math.sqrt(
+                    Math.pow(enemy.x - BALLOON_X, 2) + Math.pow(enemy.y - BALLOON_Y, 2)
+                );
+                
+                if (balloonDistance < enemy.radius + BALLOON_RADIUS) {
+                    // 如果護盾激活，敵人被消滅
+                    if (powerupActive.shield.active) {
+                        score += 5;
+                        enemiesKilled++;
+                        createExplosion(enemy.x, enemy.y, enemy.color);
+                        enemies.splice(i, 1);
+                    } else {
+                        // 氣球被刺破
+                        lives--;
+                        createExplosion(BALLOON_X, BALLOON_Y, '#FF6B6B');
+                        
+                        // 檢查遊戲是否結束
+                        if (lives <= 0) {
+                            endGame();
+                        } else {
+                            // 重置氣球位置（視覺效果）
+                            createBalloonDamageEffect();
+                        }
+                        
+                        // 移除敵人
+                        enemies.splice(i, 1);
+                        
+                        // 更新UI
+                        updateUI();
+                    }
+                }
+            }
+        }
+        
+        // 更新道具
+        function updatePowerups() {
+            for (let i = powerups.length - 1; i >= 0; i--) {
+                const powerup = powerups[i];
+                
+                // 道具緩緩下落
+                powerup.y += 1;
+                
+                // 檢查玩家是否收集到道具
+                const distance = Math.sqrt(
+                    Math.pow(player.x - powerup.x, 2) + Math.pow(player.y - powerup.y, 2)
+                );
+                
+                if (distance < player.radius + powerup.radius) {
+                    // 激活道具效果
+                    activatePowerup(powerup.type);
+                    
+                    // 創建收集效果
+                    createCollectEffect(powerup.x, powerup.y, powerup.color);
+                    
+                    // 移除道具
+                    powerups.splice(i, 1);
+                }
+                
+                // 檢查道具是否超出畫面
+                if (powerup.y > canvas.height + powerup.radius) {
+                    powerups.splice(i, 1);
+                }
+            }
+        }
+        
+        // 更新粒子效果
+        function updateParticles() {
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const particle = particles[i];
+                
+                // 更新粒子位置
+                particle.x += particle.vx;
+                particle.y += particle.vy;
+                
+                // 更新粒子生命
+                particle.life--;
+                
+                // 如果粒子生命結束，移除它
+                if (particle.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+        }
+        
+        // 更新道具計時器
+        function updatePowerupTimers() {
+            const now = Date.now();
+            
+            Object.keys(powerupActive).forEach(key => {
+                if (powerupActive[key].active) {
+                    powerupActive[key].timeLeft = powerupActive[key].maxTime - (now - powerupActive[key].startTime);
+                    
+                    if (powerupActive[key].timeLeft <= 0) {
+                        powerupActive[key].active = false;
+                        powerupActive[key].timeLeft = 0;
+                    }
+                }
+            });
+            
+            // 更新道具顯示
+            updatePowerupDisplay();
+        }
+        
+        // 生成敵人
+        function spawnEnemy() {
+            // 隨機從畫面邊緣出現
+            const side = Math.floor(Math.random() * 4); // 0:上, 1:右, 2:下, 3:左
+            let x, y;
+            
+            switch(side) {
+                case 0: // 上
+                    x = Math.random() * canvas.width;
+                    y = -30;
+                    break;
+                case 1: // 右
+                    x = canvas.width + 30;
+                    y = Math.random() * canvas.height;
+                    break;
+                case 2: // 下
+                    x = Math.random() * canvas.width;
+                    y = canvas.height + 30;
+                    break;
+                case 3: // 左
+                    x = -30;
+                    y = Math.random() * canvas.height;
+                    break;
+            }
+            
+            // 敵人顏色
+            const colors = ['#FF4444', '#FF8844', '#FF4444', '#DD4444'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            // 敵人類型
+            const enemyTypes = ['spike', 'needle', 'thorn'];
+            const type = enemyTypes[Math.floor(Math.random() * enemyTypes.length)];
+            
+            enemies.push({
+                x,
+                y,
+                radius: 15 + Math.random() * 10,
+                speed: DIFFICULTY_SETTINGS[difficulty].enemySpeed + Math.random() * 0.5,
+                color,
+                type,
+                health: DIFFICULTY_SETTINGS[difficulty].enemyHealth
+            });
+        }
+        
+        // 生成道具
+        function spawnPowerup(x = null, y = null) {
+            // 如果沒有指定位置，隨機生成
+            if (x === null || y === null) {
+                x = Math.random() * (canvas.width - 60) + 30;
+                y = -30;
+            }
+            
+            // 道具類型
+            const powerupTypes = [
+                { type: 'shield', color: '#118AB2', symbol: '🛡️' },
+                { type: 'slow', color: '#06D6A0', symbol: '🐌' },
+                { type: 'multiShot', color: '#FFD166', symbol: '🔫' },
+                { type: 'life', color: '#FF6B6B', symbol: '❤️' }
+            ];
+            
+            const powerup = powerupTypes[Math.floor(Math.random() * powerupTypes.length)];
+            
+            powerups.push({
+                x,
+                y,
+                radius: 15,
+                color: powerup.color,
+                type: powerup.type,
+                symbol: powerup.symbol
+            });
+        }
+        
+        // 激活道具效果
+        function activatePowerup(type) {
+            const now = Date.now();
+            
+            switch(type) {
+                case 'shield':
+                    powerupActive.shield.active = true;
+                    powerupActive.shield.startTime = now;
+                    powerupActive.shield.timeLeft = powerupActive.shield.maxTime;
+                    break;
+                    
+                case 'slow':
+                    powerupActive.slow.active = true;
+                    powerupActive.slow.startTime = now;
+                    powerupActive.slow.timeLeft = powerupActive.slow.maxTime;
+                    break;
+                    
+                case 'multiShot':
+                    powerupActive.multiShot.active = true;
+                    powerupActive.multiShot.startTime = now;
+                    powerupActive.multiShot.timeLeft = powerupActive.multiShot.maxTime;
+                    break;
+                    
+                case 'life':
+                    lives = Math.min(3, lives + 1);
+                    updateUI();
+                    break;
+            }
+            
+            // 播放音效（這裡用視覺效果代替）
+            createPowerupActivateEffect(type);
+        }
+        
+        // 射擊
+        function shoot() {
+            if (paused || gameOver) return;
+            
+            const bulletCount = powerupActive.multiShot.active ? 3 : 1;
+            
+            for (let i = 0; i < bulletCount; i++) {
+                let angle = 0;
+                let offset = 0;
+                
+                if (bulletCount > 1) {
+                    // 多重射擊時稍微分散角度
+                    angle = (i - (bulletCount - 1) / 2) * 0.2;
+                    offset = (i - (bulletCount - 1) / 2) * 8;
+                }
+                
+                bullets.push({
+                    x: player.x + offset,
+                    y: player.y,
+                    radius: BULLET_RADIUS,
+                    speed: BULLET_SPEED,
+                    angle: angle,
+                    color: '#FFD166'
+                });
+            }
+            
+            // 創建射擊效果
+            createShootEffect();
+        }
+        
+        // 下一關
+        function nextLevel() {
+            level++;
+            enemiesKilled = 0;
+            enemiesToKill = DIFFICULTY_SETTINGS[difficulty].enemyCount + (level - 1) * 5;
+            
+            // 清除現有敵人
+            enemies = [];
+            
+            // 增加分數獎勵
+            score += level * 100;
+            
+            // 更新UI
+            updateUI();
+            
+            // 顯示關卡訊息
+            createLevelUpEffect();
+        }
+        
+        // 結束遊戲
+        function endGame() {
+            gameOver = true;
+            
+            // 顯示遊戲結束畫面
+            finalScoreElement.textContent = score;
+            
+            if (score >= 1000) {
+                resultMessageElement.textContent = '太厲害了！你是氣球保護大師！';
+            } else if (score >= 500) {
+                resultMessageElement.textContent = '很棒！繼續努力！';
+            } else if (score >= 200) {
+                resultMessageElement.textContent = '不錯！再試一次會更好！';
+            } else {
+                resultMessageElement.textContent = '繼續努力保護氣球！';
+            }
+            
+            gameOverScreen.style.display = 'flex';
+        }
+        
+        // 繪製遊戲
+        function drawGame() {
+            // 繪製背景
+            drawBackground();
+            
+            // 繪製氣球
+            drawBalloon();
+            
+            // 繪製玩家
+            drawPlayer();
+            
+            // 繪製子彈
+            bullets.forEach(bullet => {
+                drawBullet(bullet);
+            });
+            
+            // 繪製敵人
+            enemies.forEach(enemy => {
+                drawEnemy(enemy);
+            });
+            
+            // 繪製道具
+            powerups.forEach(powerup => {
+                drawPowerup(powerup);
+            });
+            
+            // 繪製粒子效果
+            particles.forEach(particle => {
+                drawParticle(particle);
+            });
+            
+            // 繪製護盾效果
+            if (powerupActive.shield.active) {
+                drawShield();
+            }
+        }
+        
+        // 繪製背景
+        function drawBackground() {
+            // 天空漸層
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.5, '#98D8F0');
+            gradient.addColorStop(1, '#B0E5FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 雲朵
+            drawClouds();
+            
+            // 地面
+            ctx.fillStyle = '#8BC34A';
+            ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
+            
+            // 草地細節
+            ctx.fillStyle = '#7CB342';
+            for (let i = 0; i < canvas.width; i += 20) {
+                ctx.fillRect(i, canvas.height - 50, 10, 10);
+            }
+        }
+        
+        // 繪製雲朵
+        function drawClouds() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            
+            // 雲朵1
+            ctx.beginPath();
+            ctx.arc(100, 80, 20, 0, Math.PI * 2);
+            ctx.arc(130, 70, 25, 0, Math.PI * 2);
+            ctx.arc(160, 80, 20, 0, Math.PI * 2);
+            ctx.arc(130, 90, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 雲朵2
+            ctx.beginPath();
+            ctx.arc(300, 120, 20, 0, Math.PI * 2);
+            ctx.arc(330, 110, 25, 0, Math.PI * 2);
+            ctx.arc(360, 120, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 雲朵3
+            ctx.beginPath();
+            ctx.arc(500, 60, 20, 0, Math.PI * 2);
+            ctx.arc(530, 50, 25, 0, Math.PI * 2);
+            ctx.arc(560, 60, 20, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // 繪製氣球
+        function drawBalloon() {
+            // 氣球繩子
+            ctx.beginPath();
+            ctx.moveTo(BALLOON_X, BALLOON_Y + BALLOON_RADIUS);
+            ctx.lineTo(BALLOON_X, BALLOON_Y + BALLOON_RADIUS + 150);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#333';
+            ctx.stroke();
+            
+            // 氣球本體
+            ctx.beginPath();
+            ctx.arc(BALLOON_X, BALLOON_Y, BALLOON_RADIUS, 0, Math.PI * 2);
+            
+            // 氣球漸層
+            const gradient = ctx.createRadialGradient(
+                BALLOON_X - 10, BALLOON_Y - 10, 5,
+                BALLOON_X, BALLOON_Y, BALLOON_RADIUS
+            );
+            gradient.addColorStop(0, '#FF8A8A');
+            gradient.addColorStop(1, '#FF6B6B');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 氣球高光
+            ctx.beginPath();
+            ctx.arc(BALLOON_X - 15, BALLOON_Y - 15, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.fill();
+            
+            // 氣球愛心
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 30px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('♥', BALLOON_X, BALLOON_Y);
+            
+            // 氣球底部
+            ctx.beginPath();
+            ctx.arc(BALLOON_X, BALLOON_Y + BALLOON_RADIUS - 5, 8, 0, Math.PI * 2);
+            ctx.fillStyle = '#FF6B6B';
+            ctx.fill();
+            
+            // 護盾效果
+            if (powerupActive.shield.active) {
+                ctx.beginPath();
+                ctx.arc(BALLOON_X, BALLOON_Y, BALLOON_RADIUS + 15, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(17, 138, 178, 0.5)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.arc(BALLOON_X, BALLOON_Y, BALLOON_RADIUS + 10, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(17, 138, 178, 0.8)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+        
+        // 繪製玩家
+        function drawPlayer() {
+            // 玩家本體
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                player.x - 5, player.y - 5, 5,
+                player.x, player.y, player.radius
+            );
+            gradient.addColorStop(0, '#4CC9F0');
+            gradient.addColorStop(1, '#118AB2');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 玩家眼睛
+            ctx.fillStyle = 'white';
+            ctx.beginPath();
+            ctx.arc(player.x - 5, player.y - 3, 4, 0, Math.PI * 2);
+            ctx.arc(player.x + 5, player.y - 3, 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.fillStyle = '#333';
+            ctx.beginPath();
+            ctx.arc(player.x - 5, player.y - 3, 2, 0, Math.PI * 2);
+            ctx.arc(player.x + 5, player.y - 3, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 玩家嘴巴
+            ctx.beginPath();
+            ctx.arc(player.x, player.y + 5, 6, 0.2 * Math.PI, 0.8 * Math.PI);
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // 繪製子彈
+        function drawBullet(bullet) {
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, bullet.radius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                bullet.x, bullet.y, 0,
+                bullet.x, bullet.y, bullet.radius
+            );
+            gradient.addColorStop(0, '#FFF');
+            gradient.addColorStop(1, '#FFD166');
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 子彈拖尾效果
+            ctx.beginPath();
+            ctx.moveTo(bullet.x, bullet.y + bullet.radius);
+            ctx.lineTo(bullet.x, bullet.y + bullet.radius + 10);
+            ctx.strokeStyle = 'rgba(255, 209, 102, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // 繪製敵人
+        function drawEnemy(enemy) {
+            ctx.beginPath();
+            ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                enemy.x - 5, enemy.y - 5, 5,
+                enemy.x, enemy.y, enemy.radius
+            );
+            gradient.addColorStop(0, enemy.color);
+            gradient.addColorStop(1, darkenColor(enemy.color, 30));
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 敵人刺
+            if (enemy.type === 'spike') {
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const spikeLength = 10;
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(
+                        enemy.x + Math.cos(angle) * enemy.radius,
+                        enemy.y + Math.sin(angle) * enemy.radius
+                    );
+                    ctx.lineTo(
+                        enemy.x + Math.cos(angle) * (enemy.radius + spikeLength),
+                        enemy.y + Math.sin(angle) * (enemy.radius + spikeLength)
+                    );
+                    ctx.strokeStyle = darkenColor(enemy.color, 50);
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+            }
+            
+            // 敵人血量顯示
+            if (enemy.health > 1) {
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(enemy.health, enemy.x, enemy.y);
+            }
+        }
+        
+        // 繪製道具
+        function drawPowerup(powerup) {
+            ctx.beginPath();
+            ctx.arc(powerup.x, powerup.y, powerup.radius, 0, Math.PI * 2);
+            
+            const gradient = ctx.createRadialGradient(
+                powerup.x - 3, powerup.y - 3, 3,
+                powerup.x, powerup.y, powerup.radius
+            );
+            gradient.addColorStop(0, 'white');
+            gradient.addColorStop(1, powerup.color);
+            
+            ctx.fillStyle = gradient;
+            ctx.fill();
+            
+            // 道具符號
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(powerup.symbol, powerup.x, powerup.y);
+            
+            // 發光效果
+            ctx.beginPath();
+            ctx.arc(powerup.x, powerup.y, powerup.radius + 3, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        // 繪製粒子
+        function drawParticle(particle) {
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${particle.r}, ${particle.g}, ${particle.b}, ${particle.a})`;
+            ctx.fill();
+        }
+        
+        // 繪製護盾
+        function drawShield() {
+            ctx.beginPath();
+            ctx.arc(BALLOON_X, BALLOON_Y, BALLOON_RADIUS + 20, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(17, 138, 178, 0.3)';
+            ctx.lineWidth = 5;
+            ctx.stroke();
+        }
+        
+        // 工具函數：加深顏色
+        function darkenColor(color, percent) {
+            const num = parseInt(color.replace("#", ""), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = (num >> 16) - amt;
+            const G = (num >> 8 & 0x00FF) - amt;
+            const B = (num & 0x0000FF) - amt;
+            
+            return "#" + (
+                0x1000000 +
+                (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+                (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+                (B < 255 ? B < 1 ? 0 : B : 255)
+            ).toString(16).slice(1);
+        }
+        
+        // 創建擊中效果
+        function createHitEffect(x, y, color) {
+            for (let i = 0; i < 5; i++) {
+                particles.push({
+                    x,
+                    y,
+                    vx: (Math.random() - 0.5) * 5,
+                    vy: (Math.random() - 0.5) * 5,
+                    size: Math.random() * 3 + 2,
+                    r: parseInt(color.slice(1, 3), 16),
+                    g: parseInt(color.slice(3, 5), 16),
+                    b: parseInt(color.slice(5, 7), 16),
+                    a: 1,
+                    life: 20
+                });
+            }
+        }
+        
+        // 創建爆炸效果
+        function createExplosion(x, y, color) {
+            for (let i = 0; i < 15; i++) {
+                particles.push({
+                    x,
+                    y,
+                    vx: (Math.random() - 0.5) * 8,
+                    vy: (Math.random() - 0.5) * 8,
+                    size: Math.random() * 4 + 2,
+                    r: parseInt(color.slice(1, 3), 16),
+                    g: parseInt(color.slice(3, 5), 16),
+                    b: parseInt(color.slice(5, 7), 16),
+                    a: 1,
+                    life: 30
+                });
+            }
+        }
+        
+        // 創建收集效果
+        function createCollectEffect(x, y, color) {
+            for (let i = 0; i < 10; i++) {
+                particles.push({
+                    x,
+                    y,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3,
+                    size: Math.random() * 3 + 1,
+                    r: parseInt(color.slice(1, 3), 16),
+                    g: parseInt(color.slice(3, 5), 16),
+                    b: parseInt(color.slice(5, 7), 16),
+                    a: 1,
+                    life: 25
+                });
+            }
+        }
+        
+        // 創設計擊效果
+        function createShootEffect() {
+            for (let i = 0; i < 3; i++) {
+                particles.push({
+                    x: player.x,
+                    y: player.y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: -Math.random() * 3 - 2,
+                    size: Math.random() * 2 + 1,
+                    r: 255,
+                    g: 209,
+                    b: 102,
+                    a: 1,
+                    life: 15
+                });
+            }
+        }
+        
+        // 創建氣球受損效果
+        function createBalloonDamageEffect() {
+            for (let i = 0; i < 20; i++) {
+                particles.push({
+                    x: BALLOON_X,
+                    y: BALLOON_Y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    size: Math.random() * 3 + 2,
+                    r: 255,
+                    g: 107,
+                    b: 107,
+                    a: 1,
+                    life: 30
+                });
+            }
+        }
+        
+        // 創建道具激活效果
+        function createPowerupActivateEffect(type) {
+            let color;
+            switch(type) {
+                case 'shield': color = '#118AB2'; break;
+                case 'slow': color = '#06D6A0'; break;
+                case 'multiShot': color = '#FFD166'; break;
+                case 'life': color = '#FF6B6B'; break;
+                default: color = '#FFFFFF';
+            }
+            
+            for (let i = 0; i < 15; i++) {
+                particles.push({
+                    x: player.x,
+                    y: player.y,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: (Math.random() - 0.5) * 4,
+                    size: Math.random() * 4 + 2,
+                    r: parseInt(color.slice(1, 3), 16),
+                    g: parseInt(color.slice(3, 5), 16),
+                    b: parseInt(color.slice(5, 7), 16),
+                    a: 1,
+                    life: 40
+                });
+            }
+        }
+        
+        // 創建關卡升級效果
+        function createLevelUpEffect() {
+            for (let i = 0; i < 30; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    size: Math.random() * 5 + 3,
+                    r: 255,
+                    g: 255,
+                    b: 255,
+                    a: 1,
+                    life: 50
+                });
+            }
+            
+            // 顯示關卡訊息（簡單實現）
+            setTimeout(() => {
+                const message = document.createElement('div');
+                message.style.position = 'absolute';
+                message.style.top = '50%';
+                message.style.left = '50%';
+                message.style.transform = 'translate(-50%, -50%)';
+                message.style.fontSize = '3rem';
+                message.style.color = '#FFD166';
+                message.style.fontWeight = 'bold';
+                message.style.textShadow = '3px 3px 0 #000';
+                message.style.zIndex = '50';
+                message.textContent = `關卡 ${level}`;
+                
+                document.querySelector('.game-area').appendChild(message);
+                
+                setTimeout(() => {
+                    document.querySelector('.game-area').removeChild(message);
+                }, 2000);
+            }, 100);
+        }
+        
+        // 事件監聽器
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            // 空白鍵射擊
+            if (e.key === ' ' && !gameOver) {
+                shoot();
+                e.preventDefault();
+            }
+            
+            // P鍵暫停
+            if (e.key === 'p' || e.key === 'P') {
+                togglePause();
+            }
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        canvas.addEventListener('click', () => {
+            if (!gameOver && gameStarted) {
+                shoot();
+            }
+        });
+        
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            if (!gameOver && gameStarted) {
+                shoot();
+            }
+        });
+        
+        // 難度選擇
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                difficultyButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                difficulty = button.getAttribute('data-difficulty');
+                
+                if (gameStarted) {
+                    enemiesToKill = DIFFICULTY_SETTINGS[difficulty].enemyCount + (level - 1) * 5;
+                }
+            });
+        });
+        
+        // 按鈕事件
+        restartButton.addEventListener('click', () => {
+            gameStarted = true;
+            initGame();
+        });
+        
+        pauseButton.addEventListener('click', togglePause);
+        playAgainButton.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            gameStarted = true;
+            initGame();
+        });
+        
+        // 暫停/繼續遊戲
+        function togglePause() {
+            if (gameOver) return;
+            
+            paused = !paused;
+            pauseButton.textContent = paused ? '繼續遊戲' : '暫停遊戲';
+        }
+        
+        // 初始化UI
+        updateUI();
+        
+        // 開始遊戲
+        setTimeout(() => {
+            if (!gameStarted) {
+                gameStarted = true;
+                initGame();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
