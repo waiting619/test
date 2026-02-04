@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML5 貪食蛇遊戲 2.0</title>
+    <title>HTML5 貪食蛇遊戲 2.0 - 增強版</title>
+    <link rel="stylesheet" href="touch-controls.css">
     <style>
         * {
             margin: 0;
@@ -13,8 +14,8 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
-            color: #fff;
+            background: linear-gradient(135deg, #ffb6c1 0%, #ff69b4 100%);
+            color: #333;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -40,14 +41,14 @@
         h1 {
             font-size: 2.8rem;
             margin-bottom: 10px;
-            color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+            color: #d81b60;
+            text-shadow: 0 0 10px rgba(216, 27, 96, 0.3);
             letter-spacing: 2px;
         }
         
         .version-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #FF9800, #FF5722);
+            background: linear-gradient(135deg, #ff80ab, #f50057);
             color: white;
             padding: 4px 12px;
             border-radius: 20px;
@@ -58,7 +59,7 @@
         }
         
         .subtitle {
-            color: #aaa;
+            color: #880e4f;
             font-size: 1.1rem;
             margin-bottom: 25px;
         }
@@ -76,7 +77,7 @@
             position: relative;
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+            box-shadow: 0 10px 30px rgba(188, 24, 93, 0.3);
         }
         
         canvas {
@@ -93,53 +94,53 @@
         }
         
         .score-container {
-            background: rgba(30, 30, 46, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(188, 24, 93, 0.2);
         }
         
         .score-title {
             font-size: 1.2rem;
-            color: #aaa;
+            color: #880e4f;
             margin-bottom: 10px;
         }
         
         .score {
             font-size: 3rem;
             font-weight: bold;
-            color: #4CAF50;
-            text-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+            color: #d81b60;
+            text-shadow: 0 0 8px rgba(216, 27, 96, 0.3);
         }
         
         .high-score {
             margin-top: 15px;
             padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid rgba(216, 27, 96, 0.2);
         }
         
         .controls {
-            background: rgba(30, 30, 46, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             padding: 20px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(188, 24, 93, 0.2);
         }
         
         .controls h3 {
-            color: #aaa;
+            color: #880e4f;
             margin-bottom: 15px;
             font-size: 1.2rem;
         }
         
         .key {
             display: inline-block;
-            background-color: #333;
+            background-color: #f48fb1;
             padding: 8px 12px;
             border-radius: 6px;
             margin: 5px;
             font-weight: bold;
             color: #fff;
-            box-shadow: 0 3px 0 #222;
+            box-shadow: 0 3px 0 #ec407a;
         }
         
         .game-buttons {
@@ -160,72 +161,72 @@
         }
         
         #startBtn {
-            background-color: #4CAF50;
+            background-color: #ec407a;
             color: white;
         }
         
         #startBtn:hover {
-            background-color: #45a049;
+            background-color: #d81b60;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            box-shadow: 0 5px 15px rgba(236, 64, 122, 0.4);
         }
         
         #resetBtn {
-            background-color: #f44336;
+            background-color: #f06292;
             color: white;
         }
         
         #resetBtn:hover {
-            background-color: #e53935;
+            background-color: #ec407a;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4);
+            box-shadow: 0 5px 15px rgba(240, 98, 146, 0.4);
         }
         
         #restartBtn {
-            background-color: #2196F3;
+            background-color: #f48fb1;
             color: white;
             margin-top: 20px;
         }
         
         #restartBtn:hover {
-            background-color: #0b7dda;
+            background-color: #f06292;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(33, 150, 243, 0.4);
+            box-shadow: 0 5px 15px rgba(244, 143, 177, 0.4);
         }
         
         .instructions {
-            background: rgba(30, 30, 46, 0.8);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
             padding: 20px;
             margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(188, 24, 93, 0.2);
             width: 100%;
         }
         
         .instructions h3 {
-            color: #aaa;
+            color: #880e4f;
             margin-bottom: 15px;
             font-size: 1.2rem;
         }
         
         .instructions p {
-            color: #ccc;
+            color: #555;
             line-height: 1.6;
             margin-bottom: 10px;
         }
         
         .highlight {
-            color: #4CAF50;
+            color: #d81b60;
             font-weight: bold;
         }
         
         .red {
-            color: #f44336;
+            color: #e91e63;
             font-weight: bold;
         }
         
         .orange {
-            color: #FF9800;
+            color: #ff80ab;
             font-weight: bold;
         }
         
@@ -245,9 +246,9 @@
         
         .game-over h2 {
             font-size: 3rem;
-            color: #f44336;
+            color: #f48fb1;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
+            text-shadow: 0 0 10px rgba(244, 143, 177, 0.7);
         }
         
         .game-over p {
@@ -329,7 +330,7 @@
                     
                     <div class="high-score">
                         <div class="score-title">最高分紀錄</div>
-                        <div class="score" id="highScore" style="color: #FF9800;">0</div>
+                        <div class="score" id="highScore" style="color: #ff80ab;">0</div>
                     </div>
                 </div>
                 
@@ -370,7 +371,31 @@
         </div>
     </div>
 
+    <!-- 觸控控制 -->
+    <div class="touch-controls-container game1">
+        <div class="direction-controls">
+            <button class="direction-btn up" id="touchUp">↑</button>
+            <button class="direction-btn down" id="touchDown">↓</button>
+            <button class="direction-btn left" id="touchLeft">←</button>
+            <button class="direction-btn right" id="touchRight">→</button>
+        </div>
+    </div>
+
+    <!-- 音效控制按鈕 -->
+    <div id="audioControls"></div>
+
+    <!-- 觸控提示 -->
+    <div class="touch-hint" id="touchHint" style="display: none;">
+        使用方向按鈕或滑動控制蛇的移動
+    </div>
+
+    <!-- 音效管理器 -->
+    <script src="audio-manager.js"></script>
+
     <script>
+        // 音效管理器
+        const audio = window.gameAudio;
+        
         // 獲取Canvas元素和上下文
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -401,6 +426,132 @@
         const finalHighScoreElement = document.getElementById('finalHighScore');
         const newRecordElement = document.getElementById('newRecord');
         
+        // 觸控控制元素
+        const touchUp = document.getElementById('touchUp');
+        const touchDown = document.getElementById('touchDown');
+        const touchLeft = document.getElementById('touchLeft');
+        const touchRight = document.getElementById('touchRight');
+        const touchHint = document.getElementById('touchHint');
+        const audioControls = document.getElementById('audioControls');
+        
+        // 觸控控制變量
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isTouchDevice = false;
+        
+        // 檢測是否為觸控設備
+        function detectTouchDevice() {
+            return ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+        }
+        
+        // 顯示觸控提示
+        function showTouchHint() {
+            if (isTouchDevice && !localStorage.getItem('touchHintShown')) {
+                touchHint.style.display = 'block';
+                setTimeout(() => {
+                    touchHint.style.display = 'none';
+                    localStorage.setItem('touchHintShown', 'true');
+                }, 3000);
+            }
+        }
+        
+        // 初始化觸控控制
+        function initTouchControls() {
+            isTouchDevice = detectTouchDevice();
+            
+            if (isTouchDevice) {
+                // 顯示觸控控制
+                document.querySelector('.touch-controls-container').style.display = 'flex';
+                
+                // 添加觸控按鈕事件
+                touchUp.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (direction !== 'down') nextDirection = 'up';
+                    audio.playSound('button');
+                });
+                
+                touchDown.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (direction !== 'up') nextDirection = 'down';
+                    audio.playSound('button');
+                });
+                
+                touchLeft.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (direction !== 'right') nextDirection = 'left';
+                    audio.playSound('button');
+                });
+                
+                touchRight.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    if (direction !== 'left') nextDirection = 'right';
+                    audio.playSound('button');
+                });
+                
+                // 添加滑動控制
+                canvas.addEventListener('touchstart', handleTouchStart);
+                canvas.addEventListener('touchmove', handleTouchMove);
+                
+                // 顯示觸控提示
+                showTouchHint();
+            }
+            
+            // 初始化音效控制
+            audio.createSimpleToggle(audioControls);
+        }
+        
+        // 處理觸控開始
+        function handleTouchStart(e) {
+            e.preventDefault();
+            const touch = e.touches[0];
+            touchStartX = touch.clientX;
+            touchStartY = touch.clientY;
+        }
+        
+        // 處理觸控移動
+        function handleTouchMove(e) {
+            if (!touchStartX || !touchStartY) return;
+            
+            e.preventDefault();
+            const touch = e.touches[0];
+            const touchEndX = touch.clientX;
+            const touchEndY = touch.clientY;
+            
+            const dx = touchEndX - touchStartX;
+            const dy = touchEndY - touchStartY;
+            
+            // 最小滑動距離
+            const minSwipeDistance = 30;
+            
+            if (Math.abs(dx) > Math.abs(dy)) {
+                // 水平滑動
+                if (Math.abs(dx) > minSwipeDistance) {
+                    if (dx > 0 && direction !== 'left') {
+                        nextDirection = 'right';
+                        audio.playSound('button');
+                    } else if (dx < 0 && direction !== 'right') {
+                        nextDirection = 'left';
+                        audio.playSound('button');
+                    }
+                    touchStartX = null;
+                    touchStartY = null;
+                }
+            } else {
+                // 垂直滑動
+                if (Math.abs(dy) > minSwipeDistance) {
+                    if (dy > 0 && direction !== 'up') {
+                        nextDirection = 'down';
+                        audio.playSound('button');
+                    } else if (dy < 0 && direction !== 'down') {
+                        nextDirection = 'up';
+                        audio.playSound('button');
+                    }
+                    touchStartX = null;
+                    touchStartY = null;
+                }
+            }
+        }
+        
         // 初始化遊戲
         function initGame() {
             // 初始化蛇 - 長度為5，從左邊開始
@@ -425,6 +576,12 @@
             // 隱藏遊戲結束畫面
             gameOverScreen.style.display = 'none';
             newRecordElement.style.display = 'none';
+            
+            // 播放遊戲開始音效
+            audio.playSound('button');
+            
+            // 開始背景音樂
+            audio.playMusic('snakeGame');
             
             // 繪製初始遊戲狀態
             draw();
@@ -607,6 +764,9 @@
                 score += 10;
                 scoreElement.textContent = score;
                 
+                // 播放吃食物音效
+                audio.playSound('snakeEat');
+                
                 // 每得50分增加速度
                 if (score % 50 === 0 && gameSpeed > 50) {
                     gameSpeed -= 10;
@@ -615,6 +775,8 @@
                         clearInterval(gameLoop);
                         gameLoop = setInterval(update, gameSpeed);
                     }
+                    // 播放速度增加音效
+                    audio.playSound('success');
                 }
                 
                 // 生成新食物
@@ -622,6 +784,10 @@
             } else {
                 // 如果沒吃到食物，移除蛇尾
                 snake.pop();
+                // 播放移動音效（偶爾播放，避免太頻繁）
+                if (Math.random() < 0.3) {
+                    audio.playSound('snakeMove', 0.3);
+                }
             }
             
             // 繪製更新後的遊戲狀態
@@ -635,6 +801,18 @@
             
             // 檢查是否打破紀錄
             const isNewRecord = saveHighScore(score);
+            
+            // 播放遊戲結束音效
+            if (isNewRecord) {
+                audio.playSound('success');
+                audio.playMusic('gameOver');
+            } else {
+                audio.playSound('gameOver');
+                audio.pauseMusic();
+            }
+            
+            // 播放撞擊音效
+            audio.playSound('snakeCrash');
             
             // 更新遊戲結束畫面
             finalScoreElement.textContent = score;
@@ -651,12 +829,15 @@
             // 更新按鈕狀態
             startBtn.textContent = '開始遊戲';
             startBtn.disabled = false;
-            startBtn.style.backgroundColor = '#4CAF50';
+            startBtn.style.backgroundColor = '#ec407a';
         }
         
         // 開始遊戲循環
         function startGame() {
             if (gameRunning) return;
+            
+            // 播放開始音效
+            audio.playSound('button');
             
             // 如果遊戲還沒開始，確保蛇已經初始化
             if (snake.length === 0) {
@@ -668,6 +849,9 @@
             startBtn.textContent = '遊戲進行中';
             startBtn.disabled = true;
             startBtn.style.backgroundColor = '#777';
+            
+            // 恢復背景音樂
+            audio.resumeMusic();
         }
         
         // 重置遊戲
@@ -676,7 +860,14 @@
             gameRunning = false;
             startBtn.textContent = '開始遊戲';
             startBtn.disabled = false;
-            startBtn.style.backgroundColor = '#4CAF50';
+            startBtn.style.backgroundColor = '#ec407a';
+            
+            // 播放重置音效
+            audio.playSound('button');
+            
+            // 停止當前音樂，重新開始
+            audio.stopMusic();
+            
             initGame();
         }
         
@@ -707,7 +898,7 @@
                         gameRunning = false;
                         startBtn.textContent = '繼續遊戲';
                         startBtn.disabled = false;
-                        startBtn.style.backgroundColor = '#4CAF50';
+                        startBtn.style.backgroundColor = '#ec407a';
                     } else {
                         startGame();
                     }
@@ -716,15 +907,34 @@
         });
         
         // 按鈕事件監聽
-        startBtn.addEventListener('click', startGame);
-        resetBtn.addEventListener('click', resetGame);
-        restartBtn.addEventListener('click', resetGame);
+        startBtn.addEventListener('click', () => {
+            audio.playSound('button');
+            startGame();
+        });
+        resetBtn.addEventListener('click', () => {
+            audio.playSound('button');
+            resetGame();
+        });
+        restartBtn.addEventListener('click', () => {
+            audio.playSound('button');
+            resetGame();
+        });
+        
+        // 初始化觸控控制
+        initTouchControls();
         
         // 初始化遊戲
         initGame();
         
         // 繪製初始狀態
         draw();
+        
+        // 添加暫停/繼續音效
+        document.addEventListener('keydown', (e) => {
+            if (e.keyCode === 32) { // 空格鍵
+                audio.playSound('button');
+            }
+        });
     </script>
 </body>
 </html>
