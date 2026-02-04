@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2048 - 數字合併遊戲</title>
+    <!-- 觸控控制樣式 -->
+    <link rel="stylesheet" href="touch-controls.css">
     <style>
         * {
             margin: 0;
@@ -439,6 +441,18 @@
     </style>
 </head>
 <body>
+    <!-- 音效控制按鈕 -->
+    <div class="audio-controls-container">
+        <button id="toggleSound" class="audio-btn sound-on" title="切換音效">
+            <span class="audio-icon">🔊</span>
+            <span class="audio-text">音效</span>
+        </button>
+        <button id="toggleMusic" class="audio-btn music-on" title="切換背景音樂">
+            <span class="audio-icon">🎵</span>
+            <span class="audio-text">音樂</span>
+        </button>
+    </div>
+    
     <div class="container">
         <header>
             <div class="title-container">
@@ -542,7 +556,13 @@
         </footer>
     </div>
 
+    <!-- 音效管理器 -->
+    <script src="audio-manager.js"></script>
+    
     <script>
+        // 音效管理器實例
+        const audioManager = new AudioManager();
+        
         // 遊戲變數
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -559,6 +579,10 @@
         const continuePlayingButton = document.getElementById('continuePlaying');
         const newGameFromWinButton = document.getElementById('newGameFromWin');
         const colorPreview = document.getElementById('colorPreview');
+        
+        // 音效控制按鈕
+        const toggleSoundBtn = document.getElementById('toggleSound');
+        const toggleMusicBtn = document.getElementById('toggleMusic');
         
         // 移動控制按鈕
         const upBtn = document.getElementById('upBtn');
@@ -639,6 +663,12 @@
             
             // 創建顏色預覽
             createColorPreview();
+            
+            // 播放遊戲開始音效
+            audioManager.playSound('gameStart');
+            
+            // 開始背景音樂（如果啟用）
+            audioManager.startBackgroundMusic();
         }
         
         // 創建空網格
@@ -758,6 +788,14 @@
             if (tilesMoved) {
                 moved = true;
                 score += scoreAdded;
+                
+                // 播放移動音效
+                audioManager.playSound('move');
+                
+                // 如果有分數增加，播放合併音效
+                if (scoreAdded > 0) {
+                    audioManager.playSound('merge');
+                }
                 
                 // 創建動畫
                 createMoveAnimations(prevGrid, direction);
@@ -1001,6 +1039,8 @@
                     if (grid[row][col] === 2048 && !gameWon) {
                         gameWon = true;
                         winScreen.style.display = 'flex';
+                        // 播放勝利音效
+                        audioManager.playSound('win');
                     }
                 }
             }
@@ -1009,6 +1049,9 @@
             if (!canMove('up') && !canMove('down') && !canMove('left') && !canMove('right')) {
                 gameOver = true;
                 gameOverScreen.style.display = 'flex';
+                
+                // 播放遊戲結束音效
+                audioManager.playSound('gameOver');
                 
                 // 更新最高分
                 if (score > bestScore) {
@@ -1240,11 +1283,64 @@
             }
         });
         
-        // 移動控制按鈕事件
-        upBtn.addEventListener('click', () => move('up'));
-        downBtn.addEventListener('click', () => move('down'));
-        leftBtn.addEventListener('click', () => move('left'));
-        rightBtn.addEventListener('click', () => move('right'));
+        // 音效控制按鈕事件
+        toggleSoundBtn.addEventListener('click', () => {
+            audioManager.toggleSound();
+            updateAudioButtons();
+        });
+        
+        toggleMusicBtn.addEventListener('click', () => {
+            audioManager.toggleMusic();
+            updateAudioButtons();
+        });
+        
+        // 更新音效按鈕狀態
+        function updateAudioButtons() {
+            if (audioManager.soundEnabled) {
+                toggleSoundBtn.classList.remove('sound-off');
+                toggleSoundBtn.classList.add('sound-on');
+                toggleSoundBtn.querySelector('.audio-icon').textContent = '🔊';
+            } else {
+                toggleSoundBtn.classList.remove('sound-on');
+                toggleSoundBtn.classList.add('sound-off');
+                toggleSoundBtn.querySelector('.audio-icon').textContent = '🔇';
+            }
+            
+            if (audioManager.musicEnabled) {
+                toggleMusicBtn.classList.remove('music-off');
+                toggleMusicBtn.classList.add('music-on');
+                toggleMusicBtn.querySelector('.audio-icon').textContent = '🎵';
+            } else {
+                toggleMusicBtn.classList.remove('music-on');
+                toggleMusicBtn.classList.add('music-off');
+                toggleMusicBtn.querySelector('.audio-icon').textContent = '🎵❌';
+            }
+        }
+        
+        // 移動控制按鈕事件 - 添加觸覺反饋
+        const addButtonFeedback = (btn, direction) => {
+            btn.addEventListener('click', () => {
+                // 播放按鈕點擊音效
+                audioManager.playSound('buttonClick');
+                move(direction);
+            });
+            
+            // 觸控設備上的觸覺反饋
+            btn.addEventListener('touchstart', () => {
+                btn.style.transform = 'scale(0.95)';
+                btn.style.opacity = '0.8';
+            });
+            
+            btn.addEventListener('touchend', () => {
+                btn.style.transform = 'scale(1)';
+                btn.style.opacity = '1';
+            });
+        };
+        
+        addButtonFeedback(upBtn, 'up');
+        addButtonFeedback(downBtn, 'down');
+        addButtonFeedback(leftBtn, 'left');
+        addButtonFeedback(rightBtn, 'right');
         
         // 觸控滑動事件
         canvas.addEventListener('touchstart', (e) => {
@@ -1295,15 +1391,39 @@
             touchStartY = null;
         });
         
-        // 按鈕事件
-        newGameButton.addEventListener('click', initGame);
-        undoButton.addEventListener('click', undo);
-        hintButton.addEventListener('click', showHint);
-        playAgainButton.addEventListener('click', initGame);
+        // 按鈕事件 - 添加音效
+        newGameButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
+            initGame();
+        });
+        
+        undoButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
+            undo();
+        });
+        
+        hintButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
+            showHint();
+        });
+        
+        playAgainButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
+            initGame();
+        });
+        
         continuePlayingButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
             winScreen.style.display = 'none';
         });
-        newGameFromWinButton.addEventListener('click', initGame);
+        
+        newGameFromWinButton.addEventListener('click', () => {
+            audioManager.playSound('buttonClick');
+            initGame();
+        });
+        
+        // 初始化音效按鈕狀態
+        updateAudioButtons();
         
         // 初始化遊戲
         initGame();
